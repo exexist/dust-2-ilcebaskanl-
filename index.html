@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dust İlçe Başkanlığı | Operasyon Başlıyor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --dust-orange: #f59e0b;
+            --dust-black: #0a0a0a;
+            --dust-gray: #171717;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--dust-black);
+            color: #e5e5e5;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, .nav-logo { font-family: 'Orbitron', sans-serif; }
+
+        /* Skin Ticker Animasyonu */
+        .ticker-wrap {
+            width: 100%;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.9);
+            border-bottom: 1px solid rgba(245, 158, 11, 0.3);
+            position: fixed;
+            top: 0;
+            z-index: 60;
+            height: 30px;
+            display: flex;
+            align-items: center;
+        }
+
+        .ticker-move {
+            display: flex;
+            white-space: nowrap;
+            animation: ticker 60s linear infinite;
+        }
+
+        .ticker-item {
+            padding: 0 2rem;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 10px;
+            letter-spacing: 1px;
+            color: #94a3b8;
+        }
+
+        .ticker-item span { color: var(--dust-orange); }
+        .price-up { color: #4ade80; }
+        .price-down { color: #f87171; }
+
+        @keyframes ticker {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        nav { top: 30px; }
+
+        .hero-section {
+            position: relative;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hero-bg-layer {
+            position: absolute;
+            top: -10%; left: -10%;
+            width: 120%; height: 120%;
+            background: linear-gradient(rgba(10, 10, 10, 0.7), rgba(10, 10, 10, 0.9)), 
+                        url('https://images.alphacoders.com/441/441551.jpg');
+            background-size: cover;
+            background-position: center;
+            z-index: -1;
+            transition: transform 0.1s ease-out;
+        }
+
+        .hero-section::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 4px, 3px 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .glow-orange {
+            text-shadow: 0 0 15px rgba(245, 158, 11, 0.5);
+        }
+
+        .zafer-card {
+            background: rgba(23, 23, 23, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(245, 158, 11, 0.1);
+            transition: all 0.4s ease;
+            position: relative;
+        }
+
+        .zafer-card:hover {
+            border-color: var(--dust-orange);
+            box-shadow: 0 0 30px rgba(245, 158, 11, 0.15);
+            transform: translateY(-5px);
+        }
+
+        .avatar-container {
+            width: 120px; height: 120px;
+            border: 3px solid var(--dust-orange);
+            border-radius: 50%;
+            padding: 5px;
+            margin: 0 auto 1.5rem;
+            position: relative;
+        }
+
+        .avatar-container img {
+            border-radius: 50%;
+            width: 100%; height: 100%;
+            object-fit: cover;
+            filter: grayscale(30%);
+        }
+
+        #terminal-log {
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            color: #4ade80;
+            height: 100px;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 10px;
+            border-left: 2px solid var(--dust-orange);
+        }
+
+        .flash-bang {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: white; z-index: 99999; opacity: 0; pointer-events: none;
+            transition: opacity 1s ease-out;
+        }
+
+        .tactical-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(15px);
+            z-index: 100000; display: none; align-items: center; justify-content: center;
+        }
+
+        .tactical-alert {
+            background: #0f172a; border: 2px solid var(--dust-orange);
+            width: 90%; max-width: 500px; padding: 2rem; position: relative;
+            box-shadow: 0 0 50px rgba(245, 158, 11, 0.2);
+            animation: tacticalIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes tacticalIn {
+            from { transform: scale(0.8) translateY(20px); opacity: 0; }
+            to { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        .alert-title { 
+            font-family: 'Orbitron'; color: var(--dust-orange); 
+            font-size: 1.2rem; font-weight: 900; margin-bottom: 1rem;
+            border-bottom: 1px solid rgba(245, 158, 11, 0.3); padding-bottom: 0.5rem;
+        }
+
+        .alert-msg { font-size: 0.9rem; color: #cbd5e1; margin-bottom: 2rem; line-height: 1.6; }
+
+        .alert-btn {
+            background: var(--dust-orange); color: black; font-weight: 900;
+            width: 100%; padding: 1rem; text-transform: uppercase; letter-spacing: 2px;
+            font-family: 'Orbitron'; clip-path: polygon(5% 0, 100% 0, 95% 100%, 0 100%);
+            transition: 0.3s;
+        }
+
+        .alert-btn:hover { background: white; transform: scale(0.98); }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #0a0a0a; }
+        ::-webkit-scrollbar-thumb { background: var(--dust-orange); }
+
+        .btn-primary {
+            background: var(--dust-orange);
+            color: black;
+            font-weight: 900;
+            transition: all 0.3s;
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ticker-wrap">
+        <div class="ticker-move" id="skinTicker"></div>
+    </div>
+
+    <div id="tacticalOverlay" class="tactical-overlay">
+        <div class="tactical-alert">
+            <div id="alertTitle" class="alert-title">SİSTEM MESAJI</div>
+            <div id="alertMsg" class="alert-msg">Mesaj içeriği burada görünecek.</div>
+            <button class="alert-btn" onclick="closeTacticalAlert()">ONAYLA</button>
+        </div>
+    </div>
+
+    <div class="flash-bang" id="flashLayer"></div>
+
+    <nav class="fixed w-full z-50 bg-black/80 backdrop-blur-xl border-b border-white/5">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="nav-logo text-xl font-black tracking-widest text-orange-500 glow-orange">
+                DUST-II  İlçe Başkanlığı
+            </div>
+            <div class="hidden md:flex space-x-8 text-xs font-bold uppercase tracking-widest">
+                <a href="#teskilat" class="hover:text-orange-500 transition tactical-hover">Personel</a>
+                <a href="#istatistik" class="hover:text-orange-500 transition tactical-hover">Veri Paneli</a>
+                <a href="#beyanname" class="hover:text-orange-500 transition tactical-hover">Protokol</a>
+                <button onclick="gumrukMesaji(event)" class="text-orange-500 border border-orange-500/30 px-4 py-1 hover:bg-orange-500 hover:text-black transition tactical-hover">
+                    LOCKDOWN
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero-section" id="hero">
+        <div class="hero-bg-layer" id="parallaxBg"></div>
+        <div class="relative z-10 text-center px-4">
+            <div class="inline-block px-3 py-1 border border-orange-500/50 text-orange-500 text-[10px] uppercase tracking-[0.5em] mb-4 bg-orange-500/10">
+                Sektör: De_Dust2 // Aktif Sürüm 2.0
+            </div>
+            <h1 class="text-7xl md:text-9xl font-black mb-6 uppercase tracking-tighter italic">
+                GELECEK <span class="text-orange-500">DUST</span>'TA!
+            </h1>
+            <p class="max-w-2xl mx-auto text-slate-400 font-light tracking-wide text-sm md:text-base mb-10 leading-relaxed">
+                B tüneli sahipsiz bırakmayanların, liyakatli neferlerin ve haksız eco raundlara göğüs gerenlerin tek taktiksel operasyon merkezi.
+            </p>
+            <div class="flex flex-wrap justify-center gap-6">
+                <a href="#beyanname" class="btn-primary px-10 py-4 text-xs tracking-[0.2em] uppercase tactical-hover">Tüzüğü Başlat</a>
+                <a href="#teskilat" class="bg-white/5 hover:bg-white/10 border border-white/10 px-10 py-4 text-xs tracking-[0.2em] uppercase transition tactical-hover">Personel Dosyası</a>
+            </div>
+        </div>
+    </section>
+
+    <div id="terminal-log">
+        <div>[SİSTEM] Oturum açıldı: Yönetici..</div>
+        <div>[GÜVENLİK] Firewall aktif: B Site korunuyor...</div>
+    </div>
+
+    <section id="istatistik" class="py-20 bg-zinc-900/50">
+        <div class="container mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="zafer-card p-10 text-center">
+                <div class="text-4xl font-black text-orange-500 mb-2 counter" data-target="1453">0</div>
+                <div class="text-[10px] text-zinc-500 uppercase font-bold tracking-widest">Flaş Atıldı</div>
+            </div>
+            <div class="zafer-card p-10 text-center">
+                <div class="text-4xl font-black text-orange-500 mb-2 counter" data-target="100">0</div>
+                <div class="text-[10px] text-zinc-500 uppercase font-bold tracking-widest">B-Site Emniyeti</div>
+            </div>
+            <div class="zafer-card p-10 text-center">
+                <div class="text-4xl font-black text-orange-500 mb-2 counter" data-target="0">0</div>
+                <div class="text-[10px] text-zinc-500 uppercase font-bold tracking-widest">Taviz Oranı</div>
+            </div>
+            <div class="zafer-card p-10 text-center">
+                <div class="text-4xl font-black text-orange-500 mb-2 counter" data-target="31">0</div>
+                <div class="text-[10px] text-zinc-500 uppercase font-bold tracking-widest">Ace İndeksi</div>
+            </div>
+        </div>
+    </section>
+
+    <section id="teskilat" class="py-32 bg-black">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-4xl font-black mb-20 uppercase italic tracking-widest"><span class="text-orange-500">//</span> Teşkilat Şeması</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Personel Kartları -->
+                <div class="zafer-card p-8 group">
+                    <div class="avatar-container"><img src="img/emir.png" alt="Emir"></div>
+                    <h3 class="text-xl font-bold uppercase tracking-widest mb-1">Emir</h3>
+                    <div class="text-orange-500 text-[10px] font-black uppercase mb-4 tracking-widest italic">İlçe Başkanı</div>
+                    <p class="text-zinc-500 text-xs leading-relaxed italic">"Strateji bizim işimiz. Long kapısı bizim kırmızı çizgimizdir."</p>
+                </div>
+                <div class="zafer-card p-8 group">
+                    <div class="avatar-container"><img src="img/batu.png" alt="Batuhan"></div>
+                    <h3 class="text-xl font-bold uppercase tracking-widest mb-1">Batuhan</h3>
+                    <div class="text-orange-500 text-[10px] font-black uppercase mb-4 tracking-widest italic">IGL (Saha Komutanı)</div>
+                    <p class="text-zinc-500 text-xs leading-relaxed italic">"Kusursuz bir plan her raundu kazandırır."</p>
+                </div>
+                <div class="zafer-card p-8 group">
+                    <div class="avatar-container"><img src="img/müc.png" alt="Mücahit"></div>
+                    <h3 class="text-xl font-bold uppercase tracking-widest mb-1">Mücahit</h3>
+                    <div class="text-orange-500 text-[10px] font-black uppercase mb-4 tracking-widest italic">AWP Sorumlusu</div>
+                    <p class="text-zinc-500 text-xs leading-relaxed italic">"Görüş alanımdaysan, raund senin için bitmiş demektir."</p>
+                </div>
+                <div class="zafer-card p-8 group">
+                    <div class="avatar-container"><img src="img/ali.png" alt="Alican"></div>
+                    <h3 class="text-xl font-bold uppercase tracking-widest mb-1">Alican</h3>
+                    <div class="text-orange-500 text-[10px] font-black uppercase mb-4 tracking-widest italic">Entry Fragger</div>
+                    <p class="text-zinc-500 text-xs leading-relaxed italic">"Korku bizim kitabımızda yazmaz."</p>
+                </div>
+                <div class="zafer-card p-8 group">
+                    <div class="avatar-container"><img src="img/selim.png" alt="Selim"></div>
+                    <h3 class="text-xl font-bold uppercase tracking-widest mb-1">Selim</h3>
+                    <div class="text-orange-500 text-[10px] font-black uppercase mb-4 tracking-widest italic">Lurker / İstihbarat</div>
+                    <p class="text-zinc-500 text-xs leading-relaxed italic">"Sessizlik en büyük silahımızdır."</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="beyanname" class="py-32 border-t border-orange-500/20">
+        <div class="container mx-auto px-6">
+            <h2 class="text-5xl font-black mb-16 text-center italic">OPERASYON <span class="text-orange-500">BEYANNAMESİ</span></h2>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 text-left">
+                <!-- Beyanname Maddeleri -->
+                <div class="p-8 border-l-2 border-orange-500 bg-zinc-900/30">
+                    <div class="text-orange-500 font-black mb-4">01 // B-SITE PROTOKOLÜ</div>
+                    <p class="text-zinc-400 text-xs leading-relaxed">B tünel çıkışına örülecek stratejik savunma hattıyla Rush B girişimi kapımızda söndürülecektir.</p>
+                </div>
+                <div class="p-8 border-l-2 border-orange-500 bg-zinc-900/30">
+                    <div class="text-orange-500 font-black mb-4">02 // EKONOMİK REFORM</div>
+                    <p class="text-zinc-400 text-xs leading-relaxed">Lüzumsuz AWP alımları durdurulacak; kaynaklar liyakatli ekipmanlara yönlendirilecektir.</p>
+                </div>
+                <div class="p-8 border-l-2 border-orange-500 bg-zinc-900/30">
+                    <div class="text-orange-500 font-black mb-4">03 // MİD DİPLOMASİSİ</div>
+                    <p class="text-zinc-400 text-xs leading-relaxed">Mid geçişlerinde verilen her pick milli kayıptır. Her raund ücretsiz Smoke sağlanacaktır.</p>
+                </div>
+                <div class="p-8 border-l-2 border-orange-500 bg-zinc-900/30">
+                    <div class="text-orange-500 font-black mb-4">04 // KİT ZORUNLULUĞU</div>
+                    <p class="text-zinc-400 text-xs leading-relaxed">Defuse kiti olmayan neferlerin site korumasına alınması yasaklanacak, her eve bir kit projesi başlatılacaktır.</p>
+                </div>
+                <div class="p-8 border-l-2 border-orange-500 bg-zinc-900/30">
+                    <div class="text-orange-500 font-black mb-4">05 // FLAŞ TAZMİNATI</div>
+                    <p class="text-zinc-400 text-xs leading-relaxed">Takım arkadaşını kör edenlere ağır yaptırımlar uygulanacak, mağdur neferlere tazminat ödenecektir.</p>
+                </div>
+                <div class="p-8 border-l-2 border-orange-500 bg-zinc-900/30">
+                    <div class="text-orange-500 font-black mb-4">06 // SOSYAL ECO DESTEĞİ</div>
+                    <p class="text-zinc-400 text-xs leading-relaxed">Haksız yere bozulan economieslere devlet desteği sağlanacak; p250 ve yelek yardımları arttırılacaktır.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="py-20 bg-black text-center">
+        <div class="text-orange-500 font-black text-2xl mb-4 italic">DUST II // İlçe Başkanlığı</div>
+        <p class="text-[10px] text-zinc-600 uppercase tracking-[0.4em]">© 2026 Operasyon Merkezi. Ne Mutlu B Tutana!</p>
+    </footer>
+
+    <script>
+        // --- SES SİSTEMİ (AUDIO SYSTEM) ---
+        const bgMusic = new Audio('https://www.soundboard.com/handler/DownLoadTrack.ashx?cliptoken=98d9753e-52f1-4354-9721-6780c7a52553'); // CS:GO Theme Sample
+        const hoverSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3'); // Subtle UI Click
+        const beepSound = new Audio('https://www.myinstants.com/media/sounds/cs-go-bomb-beeping.mp3'); // C4 Beep
+
+        // Ses ayarları
+        bgMusic.loop = true;
+        bgMusic.volume = 0.15; // Kısık ses arka plan
+        hoverSound.volume = 0.05; // Çok kısık hover
+        beepSound.volume = 0.2;
+
+        // Arka plan müziğini ilk etkileşimde başlat (Tarayıcı kuralı)
+        document.addEventListener('click', () => {
+            if (bgMusic.paused) bgMusic.play();
+        }, { once: true });
+
+        // Hover efektini tüm butonlara/linklere bağla
+        document.querySelectorAll('.tactical-hover').forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                hoverSound.currentTime = 0;
+                hoverSound.play();
+            });
+        });
+
+        // Skin Verileri
+        const skins = [
+            { name: "Dragon Lore", price: "₺1,450,200", change: "+0.2%" },
+            { name: "Howl", price: "₺320,000", change: "+1.5%" },
+            { name: "Glock Sand Dune", price: "₺1.50", change: "-10%" },
+            { name: "Blue Gem Case Hardened", price: "₺2,100,000", change: "+5.0%" },
+            { name: "Asiimov", price: "₺4,200", change: "-2.1%" },
+            { name: "Wild Lotus", price: "₺450,000", change: "+0.8%" },
+            { name: "Gungnir", price: "₺610,000", change: "-0.4%" },
+            { name: "Printstream", price: "₺2,800", change: "+3.2%" },
+            { name: "Doppler Ruby", price: "₺180,000", change: "+0.1%" },
+            { name: "Fire Serpent", price: "₺85,000", change: "-1.2%" }
+        ];
+
+        // Ticker Doldurma
+        const tickerContainer = document.getElementById('skinTicker');
+        function populateTicker() {
+            const content = skins.map(skin => {
+                const isUp = skin.change.startsWith('+');
+                const icon = isUp ? '▲' : '▼';
+                const colorClass = isUp ? 'price-up' : 'price-down';
+                return `<div class="ticker-item"><span>${skin.name}:</span> ${skin.price} <span class="${colorClass}">(${icon} ${skin.change})</span></div>`;
+            }).join('');
+            tickerContainer.innerHTML = content + content;
+        }
+        populateTicker();
+
+        // Taktiksel Alert
+        function showTacticalAlert(title, message) {
+            document.getElementById('alertTitle').innerText = title;
+            document.getElementById('alertMsg').innerText = message;
+            document.getElementById('tacticalOverlay').style.display = 'flex';
+        }
+
+        function closeTacticalAlert() {
+            document.getElementById('tacticalOverlay').style.display = 'none';
+        }
+
+        // Parallax
+        document.addEventListener('mousemove', (e) => {
+            const moveX = (e.clientX - window.innerWidth / 2) * 0.015;
+            const moveY = (e.clientY - window.innerHeight / 2) * 0.015;
+            const bg = document.getElementById('parallaxBg');
+            if(bg) bg.style.transform = `translate(${moveX}px, ${moveY}px) scale(1.1)`;
+        });
+
+        // Sayaçlar
+        const counters = document.querySelectorAll('.counter');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const target = +entry.target.getAttribute('data-target');
+                    let count = 0;
+                    const update = () => {
+                        const inc = target / 50;
+                        if (count < target) {
+                            count += inc;
+                            entry.target.innerText = Math.ceil(count);
+                            setTimeout(update, 30);
+                        } else {
+                            entry.target.innerText = target + (target === 100 ? '%' : '');
+                        }
+                    };
+                    update();
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 1 });
+        counters.forEach(c => observer.observe(c));
+
+        // Terminal Log
+        const logEntries = ["Dust_2 yüklendi...", "Güvenlik hattı aktif.", "B Tüneli tarandı."];
+        let logIndex = 0;
+        setInterval(() => {
+            const logDiv = document.getElementById('terminal-log');
+            if(logDiv) {
+                const entry = document.createElement('div');
+                entry.innerText = `[${new Date().toLocaleTimeString()}] ${logEntries[logIndex % logEntries.length]}`;
+                logDiv.prepend(entry);
+                logIndex++;
+            }
+        }, 4000);
+
+        // Lockdown ve Flashbang (SES EKLENDİ)
+        function gumrukMesaji(e) {
+            const btn = e.currentTarget;
+            btn.innerText = "KİLİTLENİYOR...";
+            btn.style.pointerEvents = "none";
+            
+            // Bomb Bip Sesini Çal
+            beepSound.currentTime = 0;
+            beepSound.play();
+            
+            setTimeout(() => {
+                const flash = document.getElementById('flashLayer');
+                flash.style.opacity = "1";
+                flash.style.pointerEvents = "all";
+                
+                setTimeout(() => {
+                    flash.style.opacity = "0";
+                    flash.style.pointerEvents = "none";
+                    btn.innerText = "LOCKDOWN";
+                    btn.style.pointerEvents = "auto";
+                    
+                    showTacticalAlert(
+                        "KRİTİK GÜMRÜK BİLDİRİMİ", 
+                        "B Tüneli mühürlendi. Sınır hatları kontrol altına alındı. Kaçak geçişler engellendi!"
+                    );
+                }, 1000);
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
