@@ -14,6 +14,10 @@
             --dust-gray: #171717;
         }
 
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--dust-black);
@@ -222,17 +226,32 @@
             <div class="nav-logo text-sm md:text-xl font-black tracking-widest text-orange-500 glow-orange truncate mr-4">
                 DUST-II  İlçe Başkanlığı
             </div>
-            <div class="hidden md:flex space-x-8 text-[10px] font-bold uppercase tracking-widest shrink-0">
+            
+            <!-- Masaüstü Navigasyon -->
+            <div class="hidden md:flex items-center space-x-6 text-[10px] font-bold uppercase tracking-widest shrink-0">
                 <a href="#teskilat" class="hover:text-orange-500 transition tactical-hover">Personel</a>
                 <a href="#istatistik" class="hover:text-orange-500 transition tactical-hover">Veri Paneli</a>
                 <a href="#beyanname" class="hover:text-orange-500 transition tactical-hover">Protokol</a>
+                
+                <!-- Katıl Butonu -->
+                <a href="#kayit-formu" class="bg-orange-500 text-black px-5 py-1.5 hover:bg-white transition tactical-hover" style="clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);">
+                    KATIL
+                </a>
+
                 <button onclick="gumrukMesaji(event)" class="text-orange-500 border border-orange-500/30 px-4 py-1 hover:bg-orange-500 hover:text-black transition tactical-hover">
                     LOCKDOWN
                 </button>
             </div>
-            <button onclick="gumrukMesaji(event)" class="md:hidden text-orange-500 border border-orange-500/30 px-3 py-1 text-[9px] font-bold uppercase tracking-tighter hover:bg-orange-500 hover:text-black transition">
-                LOCKDOWN
-            </button>
+
+            <!-- Mobil Navigasyon -->
+            <div class="flex md:hidden items-center gap-2">
+                <a href="#kayit-formu" class="bg-orange-500 text-black px-3 py-1 text-[9px] font-bold uppercase tracking-tighter">
+                    KATIL
+                </a>
+                <button onclick="gumrukMesaji(event)" class="text-orange-500 border border-orange-500/30 px-3 py-1 text-[9px] font-bold uppercase tracking-tighter hover:bg-orange-500 hover:text-black transition">
+                    LOCKDOWN
+                </button>
+            </div>
         </div>
     </nav>
 
@@ -351,13 +370,126 @@
         </div>
     </section>
 
+    <!-- Liyakat Kartı Jeneratörü -->
+    <section id="nefer-kart-gen" class="py-20 bg-black border-t border-orange-500/20">
+        <div class="container mx-auto px-4 md:px-6">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-5xl font-black italic uppercase">LİYAKAT <span class="text-orange-500">KARTI</span> OLUŞTUR</h2>
+                <p class="text-zinc-500 text-[10px] mt-4 tracking-widest uppercase">Teşkilat kimliğini hemen dijital olarak teslim al.</p>
+            </div>
+
+            <div class="flex flex-col lg:flex-row gap-12 items-center justify-center">
+                <div class="w-full max-w-md space-y-6 zafer-card p-8">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold text-orange-500 uppercase tracking-widest">Nefer Adı / Kod Adı</label>
+                        <input type="text" id="cardName" placeholder="Örn: EMİR" maxlength="15" 
+                               class="w-full bg-black/50 border border-white/10 p-3 text-sm focus:border-orange-500 outline-none transition text-white uppercase">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold text-orange-500 uppercase tracking-widest">Mevcut Rütbe</label>
+                        <select id="cardRank" class="w-full bg-black/50 border border-white/10 p-3 text-sm focus:border-orange-500 outline-none transition text-zinc-400 uppercase">
+                            <option>Gümüş Seçkin</option>
+                            <option>Seçkin Altın Nova</option>
+                            <option>Usta Muhafız</option>
+                            <option>Efsanevi Kartal</option>
+                            <option>Birinci Sınıf Üstün Usta</option>
+                            <option>Küresel Seçkin</option>
+                            <option>Teşkilat Başkanı</option>
+                        </select>
+                    </div>
+                    <button onclick="generateCard()" class="w-full btn-primary py-4 text-[10px] tracking-[0.3em] uppercase tactical-hover">
+                        KİMLİĞİ OLUŞTUR
+                    </button>
+                </div>
+
+                <div class="relative group">
+                    <canvas id="idCardCanvas" width="500" height="300" class="max-w-full h-auto border border-orange-500/30 shadow-2xl"></canvas>
+                    <div class="mt-6 text-center">
+                        <button id="downloadBtn" onclick="downloadCard()" class="hidden bg-white/5 hover:bg-white/10 border border-white/10 px-6 py-3 text-[10px] tracking-[0.2em] uppercase transition">
+                            KARTI CİHAZA İNDİR (.PNG)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Liyakatli Nefer Kayıt Formu -->
+    <section id="kayit-formu" class="py-20 md:py-32 bg-zinc-900/30 border-t border-white/5">
+        <div class="container mx-auto px-4 md:px-6">
+            <div class="max-w-3xl mx-auto zafer-card p-8 md:p-12 border-2 border-orange-500/20">
+                <div class="text-center mb-10">
+                    <div class="inline-block px-3 py-1 border border-orange-500/50 text-orange-500 text-[10px] uppercase tracking-widest mb-4">
+                        Görev Emri: Form-2026
+                    </div>
+                    <h2 class="text-3xl md:text-5xl font-black italic uppercase">LİYAKATLİ <span class="text-orange-500">NEFER</span> KAYDI</h2>
+                    <p class="text-zinc-500 text-[10px] mt-4 tracking-wider uppercase">B-Site savunmasında görev almak isteyen gönüllülerin dikkatine.</p>
+                </div>
+
+                <form id="neferForm" onsubmit="neferKaydet(event)" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-bold text-orange-500 uppercase tracking-widest">Ad Soyad / Kod Adı</label>
+                            <input type="text" required placeholder="Örn: Xantares" 
+                                   class="w-full bg-black/50 border border-white/10 p-3 text-sm focus:border-orange-500 outline-none transition uppercase text-white">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-bold text-orange-500 uppercase tracking-widest">Steam ID / Rütbe</label>
+                            <input type="text" required placeholder="Örn: Global Elite" 
+                                   class="w-full bg-black/50 border border-white/10 p-3 text-sm focus:border-orange-500 outline-none transition text-white">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-bold text-orange-500 uppercase tracking-widest">Zimmetlenecek Silah</label>
+                            <select class="w-full bg-black/50 border border-white/10 p-3 text-sm focus:border-orange-500 outline-none transition uppercase text-zinc-400">
+                                <option>AK-47 (Vatansever)</option>
+                                <option>M4A1-S (Sessiz Operatör)</option>
+                                <option>AWP (Keskin Göz)</option>
+                                <option>P90 (Rush B Uzmanı)</option>
+                                <option>Deagle (Tek Atım)</option>
+                            </select>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-bold text-orange-500 uppercase tracking-widest">Saha Uzmanlığı</label>
+                            <select class="w-full bg-black/50 border border-white/10 p-3 text-sm focus:border-orange-500 outline-none transition uppercase text-zinc-400">
+                                <option>Entry Fragger (Öncü)</option>
+                                <option>Support (Destek)</option>
+                                <option>Lurker (Gizli Sızma)</option>
+                                <option>IGL (Saha Komutanı)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold text-orange-500 uppercase tracking-widest">Neden Bizimle Savaşmalısın?</label>
+                        <textarea rows="3" placeholder="Liyakatinizi açıklayın..." 
+                                  class="w-full bg-black/50 border border-white/10 p-3 text-sm focus:border-orange-500 outline-none transition text-white"></textarea>
+                    </div>
+
+                    <div class="flex items-start gap-3 p-4 bg-orange-500/5 border border-orange-500/20">
+                        <input type="checkbox" required class="mt-1 accent-orange-500">
+                        <p class="text-[10px] text-zinc-400 uppercase leading-relaxed">
+                            B tüneli sahipsiz bırakmayacağıma, haksız eco raundlarda takımımı satmayacağıma ve başkanlık talimatlarına uyacağıma <span class="text-orange-500">and içerim.</span>
+                        </p>
+                    </div>
+
+                    <button type="submit" class="w-full btn-primary py-4 text-[10px] tracking-[0.3em] uppercase">
+                        TEŞKİLATA KATIL
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
     <footer class="py-12 md:py-20 bg-black text-center px-4">
         <div class="text-orange-500 font-black text-xl md:text-2xl mb-4 italic">DUST II // İlçe Başkanlığı</div>
         <p class="text-[9px] md:text-[10px] text-zinc-600 uppercase tracking-[0.3em] md:tracking-[0.4em]">© 2026 Operasyon Merkezi. Ne Mutlu B Tutana!</p>
     </footer>
 
     <script>
-        // --- SES SİSTEMİ (AUDIO SYSTEM) ---
+        // --- SES SİSTEMİ ---
         const bgMusic = new Audio('https://www.soundboard.com/handler/DownLoadTrack.ashx?cliptoken=98d9753e-52f1-4354-9721-6780c7a52553');
         const hoverSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
         const beepSound = new Audio('https://www.myinstants.com/media/sounds/cs-go-bomb-beeping.mp3');
@@ -485,6 +617,76 @@
                 }, 1000);
             }, 1000);
         }
+
+        function neferKaydet(event) {
+            event.preventDefault();
+            const btn = event.target.querySelector('button');
+            const originalText = btn.innerText;
+            btn.innerText = "SİSTEME İŞLENİYOR...";
+            btn.style.pointerEvents = "none";
+
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.pointerEvents = "auto";
+                showTacticalAlert(
+                    "KAYIT BAŞARILI!", 
+                    "Liyakatli nefer dosyanız İlçe Başkanlığı arşivine eklendi. Gazanız mübarek olsun!"
+                );
+                event.target.reset();
+            }, 2000);
+        }
+
+        function generateCard() {
+            const canvas = document.getElementById('idCardCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const name = document.getElementById('cardName').value || "İSİMSİZ NEFER";
+            const rank = document.getElementById('cardRank').value;
+
+            ctx.fillStyle = '#0a0a0a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = '#f59e0b';
+            ctx.lineWidth = 10;
+            ctx.strokeRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#f59e0b';
+            ctx.font = 'bold 22px Orbitron, sans-serif';
+            ctx.fillText('DUST-II İLÇE BAŞKANLIĞI', 30, 55);
+            
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '10px Orbitron, sans-serif';
+            ctx.fillText('RESMİ PERSONEL YETKİ BELGESİ', 30, 75);
+
+            ctx.fillStyle = '#f59e0b';
+            ctx.font = 'bold 11px Inter, sans-serif';
+            ctx.fillText('AD SOYAD / KOD ADI:', 30, 135);
+            
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '900 30px Orbitron, sans-serif';
+            ctx.fillText(name.toUpperCase(), 30, 175);
+
+            ctx.fillStyle = '#f59e0b';
+            ctx.font = 'bold 11px Inter, sans-serif';
+            ctx.fillText('OPERASYONEL RÜTBE:', 30, 220);
+            
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 18px Inter, sans-serif';
+            ctx.fillText(rank.toUpperCase(), 30, 245);
+
+            document.getElementById('downloadBtn').classList.remove('hidden');
+        }
+
+        function downloadCard() {
+            const canvas = document.getElementById('idCardCanvas');
+            const link = document.createElement('a');
+            link.download = `liyakat-karti-${Date.now()}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        window.onload = () => {
+            if(document.getElementById('idCardCanvas')) generateCard();
+        };
     </script>
 </body>
 </html>
