@@ -203,6 +203,49 @@
             transition: all 0.3s;
             clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
         }
+
+        /* Taktik Danışmanı Chat CSS */
+        .chat-widget {
+            position: fixed; bottom: 20px; left: 20px; z-index: 100;
+            font-family: 'Inter', sans-serif;
+        }
+        .chat-btn {
+            background: var(--dust-orange); color: black; width: 56px; height: 56px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.4); cursor: pointer; transition: 0.3s;
+        }
+        .chat-btn:hover { transform: scale(1.05); background: white; }
+        .chat-window {
+            position: absolute; bottom: 70px; left: 0; width: 320px; height: 400px;
+            background: rgba(10, 10, 10, 0.95); border: 2px solid var(--dust-orange);
+            box-shadow: 0 0 30px rgba(0,0,0,0.5); display: none; flex-direction: column;
+            backdrop-filter: blur(10px); animation: tacticalIn 0.2s ease-out;
+        }
+        .chat-header {
+            background: rgba(245, 158, 11, 0.1); border-bottom: 1px solid rgba(245, 158, 11, 0.2);
+            padding: 12px; display: flex; justify-content: space-between; items-center;
+        }
+        .chat-body { flex: 1; overflow-y: auto; padding: 12px; font-size: 12px; }
+        .chat-footer { padding: 8px; border-top: 1px solid rgba(255,255,255,0.05); display: flex; gap: 4px; }
+        .chat-msg { margin-bottom: 8px; padding: 8px 12px; border-radius: 4px; max-width: 85%; word-break: break-word; }
+        .msg-ai { background: rgba(245, 158, 11, 0.1); border-left: 2px solid var(--dust-orange); color: #e2e8f0; }
+        .msg-user { background: #1e293b; color: white; margin-left: auto; text-align: right; }
+
+        /* C4 Mini Oyunu CSS */
+        .c4-screen {
+            font-family: 'Orbitron', monospace;
+            background: #111;
+            border: 3px solid #333;
+            box-shadow: inset 0 0 20px rgba(239, 68, 68, 0.2);
+        }
+        .wire-btn {
+            height: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .wire-btn:hover { transform: scaleY(1.3); }
+        .wire-cut { opacity: 0.2; pointer-events: none; border-style: dashed !important; }
     </style>
 </head>
 <body>
@@ -227,15 +270,17 @@
                 DUST-II  İlçe Başkanlığı
             </div>
             
-            <!-- Masaüstü Navigasyon -->
-            <div class="hidden md:flex items-center space-x-6 text-[10px] font-bold uppercase tracking-widest shrink-0">
+            <div class="hidden md:flex items-center space-x-4 text-[10px] font-bold uppercase tracking-widest shrink-0">
                 <a href="#teskilat" class="hover:text-orange-500 transition tactical-hover">Personel</a>
                 <a href="#istatistik" class="hover:text-orange-500 transition tactical-hover">Veri Paneli</a>
                 <a href="#beyanname" class="hover:text-orange-500 transition tactical-hover">Protokol</a>
                 
-                <!-- Katıl Butonu -->
-                <a href="#kayit-formu" class="bg-orange-500 text-black px-5 py-1.5 hover:bg-white transition tactical-hover" style="clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);">
+                <a href="#kayit-formu" class="bg-orange-500 text-black px-4 py-1.5 hover:bg-white transition tactical-hover" style="clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);">
                     KATIL
+                </a>
+
+                <a href="kasaac.html" class="bg-transparent border border-red-500 text-red-500 hover:bg-red-500 hover:text-black px-4 py-1.5 transition tracking-widest font-black shadow-[0_0_15px_rgba(239,68,68,0.3)] animate-pulse" style="clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);">
+                    KASA AÇ
                 </a>
 
                 <button onclick="gumrukMesaji(event)" class="text-orange-500 border border-orange-500/30 px-4 py-1 hover:bg-orange-500 hover:text-black transition tactical-hover">
@@ -243,12 +288,14 @@
                 </button>
             </div>
 
-            <!-- Mobil Navigasyon -->
-            <div class="flex md:hidden items-center gap-2">
-                <a href="#kayit-formu" class="bg-orange-500 text-black px-3 py-1 text-[9px] font-bold uppercase tracking-tighter">
+            <div class="flex md:hidden items-center gap-1.5">
+                <a href="#kayit-formu" class="bg-orange-500 text-black px-2 py-1 text-[9px] font-bold uppercase tracking-tighter">
                     KATIL
                 </a>
-                <button onclick="gumrukMesaji(event)" class="text-orange-500 border border-orange-500/30 px-3 py-1 text-[9px] font-bold uppercase tracking-tighter hover:bg-orange-500 hover:text-black transition">
+                <a href="kasaac.html" class="bg-red-600 text-white px-2 py-1 text-[9px] font-black uppercase tracking-tighter shadow-lg">
+                    KASA AÇ
+                </a>
+                <button onclick="gumrukMesaji(event)" class="text-orange-500 border border-orange-500/30 px-2 py-1 text-[9px] font-bold uppercase tracking-tighter hover:bg-orange-500 hover:text-black transition">
                     LOCKDOWN
                 </button>
             </div>
@@ -296,6 +343,31 @@
             <div class="zafer-card p-6 md:p-10 text-center">
                 <div class="text-2xl md:text-4xl font-black text-orange-500 mb-1 counter" data-target="31">0</div>
                 <div class="text-[8px] md:text-[10px] text-zinc-500 uppercase font-bold tracking-widest">Ace İndeksi</div>
+            </div>
+        </div>
+    </section>
+
+    <section id="c4-game" class="py-20 bg-zinc-950 border-t border-orange-500/20">
+        <div class="container mx-auto px-4 md:px-6 text-center">
+            <h2 class="text-3xl md:text-5xl font-black mb-4 italic uppercase">BOMB HAS BEEN <span class="text-red-500">PLANTED</span></h2>
+            <p class="text-zinc-500 text-[10px] mb-12 tracking-widest uppercase">Doğru kabloyu keserek B-Site alanını kurtar ya da imha kitinin olmamasının bedelini öde!</p>
+            
+            <div class="max-w-md mx-auto c4-screen rounded-xl p-6 border-2 border-red-500/30">
+                <div class="bg-black border border-red-500/50 rounded p-4 mb-6 text-center">
+                    <div id="c4-timer" class="text-5xl font-bold text-red-500 tracking-wider">45:00</div>
+                    <div id="c4-status" class="text-[10px] text-zinc-500 uppercase mt-2 tracking-widest">SİSTEM BEKLEMEDE</div>
+                </div>
+
+                <div id="wires-container" class="space-y-4 my-8 pointer-events-none opacity-40">
+                    <div onclick="cutWire(0, this)" class="wire-btn bg-red-600 border-y border-red-400"></div>
+                    <div onclick="cutWire(1, this)" class="wire-btn bg-blue-600 border-y border-blue-400"></div>
+                    <div onclick="cutWire(2, this)" class="wire-btn bg-yellow-500 border-y border-yellow-300"></div>
+                    <div onclick="cutWire(3, this)" class="wire-btn bg-green-600 border-y border-green-400"></div>
+                </div>
+
+                <button id="c4-start-btn" onclick="startC4Game()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 text-xs tracking-widest uppercase rounded transition">
+                    BOMBAYI AKTİF ET
+                </button>
             </div>
         </div>
     </section>
@@ -360,7 +432,7 @@
                 </div>
                 <div class="p-6 md:p-8 border-l-2 border-orange-500 bg-zinc-900/30">
                     <div class="text-orange-500 text-[10px] md:text-xs font-black mb-3 md:mb-4">05 // FLAŞ TAZMİNATI</div>
-                    <p class="text-zinc-400 text-[10px] md:text-xs leading-relaxed">Takım arkadaşını kör edenlere ağır yaptırımlar uygulanacak, mağdur neferlere tazminat ödenecektir.</p>
+                    <p class="text-zinc-400 text-[10px] md:text-xs leading-relaxed">Takım arkadaşını kör edenlere ağır yaptırımlar uygulanacak, mağdur neferlerin tazminat ödenecektir.</p>
                 </div>
                 <div class="p-6 md:p-8 border-l-2 border-orange-500 bg-zinc-900/30">
                     <div class="text-orange-500 text-[10px] md:text-xs font-black mb-3 md:mb-4">06 // SOSYAL ECO DESTEĞİ</div>
@@ -370,7 +442,6 @@
         </div>
     </section>
 
-    <!-- Liyakat Kartı Jeneratörü -->
     <section id="nefer-kart-gen" class="py-20 bg-black border-t border-orange-500/20">
         <div class="container mx-auto px-4 md:px-6">
             <div class="text-center mb-12">
@@ -388,12 +459,13 @@
                     <div class="space-y-2">
                         <label class="text-[10px] font-bold text-orange-500 uppercase tracking-widest">Mevcut Rütbe</label>
                         <select id="cardRank" class="w-full bg-black/50 border border-white/10 p-3 text-sm focus:border-orange-500 outline-none transition text-zinc-400 uppercase">
-                            <option>Silver Elite</option>
-                        <option>Gold Nova Master</option>
-                        <option>Master Guardian</option>
-                        <option>Legendary Eagle</option>
-                        <option>Supreme First Class</option>
-                        <option>The Global Elite</option>
+                            <option>Gümüş Seçkin</option>
+                            <option>Seçkin Altın Nova</option>
+                            <option>Usta Muhafız</option>
+                            <option>Efsanevi Kartal</option>
+                            <option>Birinci Sınıf Üstün Usta</option>
+                            <option>Küresel Seçkin</option>
+                            <option>Teşkilat Başkanı</option>
                         </select>
                     </div>
                     <button onclick="generateCard()" class="w-full btn-primary py-4 text-[10px] tracking-[0.3em] uppercase tactical-hover">
@@ -413,7 +485,6 @@
         </div>
     </section>
 
-    <!-- Liyakatli Nefer Kayıt Formu -->
     <section id="kayit-formu" class="py-20 md:py-32 bg-zinc-900/30 border-t border-white/5">
         <div class="container mx-auto px-4 md:px-6">
             <div class="max-w-3xl mx-auto zafer-card p-8 md:p-12 border-2 border-orange-500/20">
@@ -482,13 +553,35 @@
         </div>
     </section>
 
+    <div class="chat-widget">
+        <div class="chat-btn" onclick="toggleChat()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        </div>
+        <div id="chatWindow" class="chat-window">
+            <div class="chat-header">
+                <span class="text-[11px] font-black tracking-widest text-orange-500 font-mono">TAKTİK DANIŞMANI v1.0</span>
+                <button onclick="toggleChat()" class="text-zinc-500 hover:text-white text-xs">✕</button>
+            </div>
+            <div id="chatBody" class="chat-body">
+                <div class="chat-msg msg-ai">
+                    Selam asker! Ben Dust-II İlçe Başkanlığı Taktik Danışmanı Botu. Stratejik bir yardıma mı ihtiyacın var? Aşağıdaki butonlardan bir durum seç, sana anında emirleri yazayım!
+                </div>
+            </div>
+            <div class="chat-footer grid grid-cols-2 gap-1 bg-black/40">
+                <button onclick="taktikAl('eco')" class="text-[9px] font-bold border border-orange-500/30 text-orange-500 py-1 hover:bg-orange-500 hover:text-black transition uppercase">Eco Raund</button>
+                <button onclick="taktikAl('rush')" class="text-[9px] font-bold border border-orange-500/30 text-orange-500 py-1 hover:bg-orange-500 hover:text-black transition uppercase">B Rush Geliyor</button>
+                <button onclick="taktikAl('awp')" class="text-[9px] font-bold border border-orange-500/30 text-orange-500 py-1 hover:bg-orange-500 hover:text-black transition uppercase">Mid AWP Kesiyor</button>
+                <button onclick="taktikAl('long')" class="text-[9px] font-bold border border-orange-500/30 text-orange-500 py-1 hover:bg-orange-500 hover:text-black transition uppercase">Long Kapısı</button>
+            </div>
+        </div>
+    </div>
+
     <footer class="py-12 md:py-20 bg-black text-center px-4">
         <div class="text-orange-500 font-black text-xl md:text-2xl mb-4 italic">DUST II // İlçe Başkanlığı</div>
         <p class="text-[9px] md:text-[10px] text-zinc-600 uppercase tracking-[0.3em] md:tracking-[0.4em]">© 2026 Operasyon Merkezi. Ne Mutlu B Tutana!</p>
     </footer>
 
     <script>
-        // --- SES SİSTEMİ ---
         const bgMusic = new Audio('https://www.soundboard.com/handler/DownLoadTrack.ashx?cliptoken=98d9753e-52f1-4354-9721-6780c7a52553');
         const hoverSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
         const beepSound = new Audio('https://www.myinstants.com/media/sounds/cs-go-bomb-beeping.mp3');
@@ -594,25 +687,18 @@
             const btn = e.currentTarget;
             btn.innerText = "KİLİTLENİYOR...";
             btn.style.pointerEvents = "none";
-            
             beepSound.currentTime = 0;
             beepSound.play();
-            
             setTimeout(() => {
                 const flash = document.getElementById('flashLayer');
                 flash.style.opacity = "1";
                 flash.style.pointerEvents = "all";
-                
                 setTimeout(() => {
                     flash.style.opacity = "0";
                     flash.style.pointerEvents = "none";
                     btn.innerText = "LOCKDOWN";
                     btn.style.pointerEvents = "auto";
-                    
-                    showTacticalAlert(
-                        "KRİTİK GÜMRÜK BİLDİRİMİ", 
-                        "B Tüneli mühürlendi. Sınır hatları kontrol altına alındı. Kaçak geçişler engellendi!"
-                    );
+                    showTacticalAlert("KRİTİK GÜMRÜK BİLDİRİMİ", "B Tüneli mühürlendi. Sınır hatları kontrol altına alındı.");
                 }, 1000);
             }, 1000);
         }
@@ -623,14 +709,10 @@
             const originalText = btn.innerText;
             btn.innerText = "SİSTEME İŞLENİYOR...";
             btn.style.pointerEvents = "none";
-
             setTimeout(() => {
                 btn.innerText = originalText;
                 btn.style.pointerEvents = "auto";
-                showTacticalAlert(
-                    "KAYIT BAŞARILI!", 
-                    "Liyakatli nefer dosyanız İlçe Başkanlığı arşivine eklendi. Gazanız mübarek olsun!"
-                );
+                showTacticalAlert("KAYIT BAŞARILI!", "Liyakatli nefer dosyanız İlçe Başkanlığı arşivine eklendi.");
                 event.target.reset();
             }, 2000);
         }
@@ -641,37 +723,29 @@
             const ctx = canvas.getContext('2d');
             const name = document.getElementById('cardName').value || "İSİMSİZ NEFER";
             const rank = document.getElementById('cardRank').value;
-
             ctx.fillStyle = '#0a0a0a';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.strokeStyle = '#f59e0b';
             ctx.lineWidth = 10;
             ctx.strokeRect(0, 0, canvas.width, canvas.height);
-
             ctx.fillStyle = '#f59e0b';
             ctx.font = 'bold 22px Orbitron, sans-serif';
             ctx.fillText('DUST-II İLÇE BAŞKANLIĞI', 30, 55);
-            
             ctx.fillStyle = '#ffffff';
             ctx.font = '10px Orbitron, sans-serif';
             ctx.fillText('RESMİ PERSONEL YETKİ BELGESİ', 30, 75);
-
             ctx.fillStyle = '#f59e0b';
             ctx.font = 'bold 11px Inter, sans-serif';
             ctx.fillText('AD SOYAD / KOD ADI:', 30, 135);
-            
             ctx.fillStyle = '#ffffff';
             ctx.font = '900 30px Orbitron, sans-serif';
             ctx.fillText(name.toUpperCase(), 30, 175);
-
             ctx.fillStyle = '#f59e0b';
             ctx.font = 'bold 11px Inter, sans-serif';
             ctx.fillText('OPERASYONEL RÜTBE:', 30, 220);
-            
             ctx.fillStyle = '#ffffff';
             ctx.font = 'bold 18px Inter, sans-serif';
             ctx.fillText(rank.toUpperCase(), 30, 245);
-
             document.getElementById('downloadBtn').classList.remove('hidden');
         }
 
@@ -683,9 +757,79 @@
             link.click();
         }
 
-        window.onload = () => {
-            if(document.getElementById('idCardCanvas')) generateCard();
-        };
+        function toggleChat() {
+            const chatWin = document.getElementById('chatWindow');
+            chatWin.style.display = (chatWin.style.display === 'flex') ? 'none' : 'flex';
+        }
+
+        function taktikAl(durum) {
+            const chatBody = document.getElementById('chatBody');
+            let userText = ""; let aiText = "";
+            const cevaplar = {
+                eco: { user: "Para bitti komutanım, ne yapalım?", ai: "Liyakatli nefer pes etmez! Hemen p250 veya Deagle çekin, B tünel arkası saklanıp yakın temas bekleyin." },
+                rush: { user: "B tünelde ayak sesleri var, rush!", ai: "Panik yok! Derhal Molotof veya Smoke fırlat tünel çıkışına. Körleme flaş atıp çapraz ateşe alın!" },
+                awp: { user: "Mid kapıda AWP bekliyor geçemiyoruz.", ai: "Zıplama, intihardır! Tam aralığa Smoke atıp görüşü kapat, tünel üzerinden operasyon başlat!" },
+                long: { user: "Long kapısını tutamıyoruz baskı var.", ai: "Long kırmızı çizgimizdir! Flaşsız çıkmayın, Mücahit AWP ile açıyı tutsun." }
+            };
+            userText = cevaplar[durum].user; aiText = cevaplar[durum].ai;
+            chatBody.innerHTML += `<div class="chat-msg msg-user">${userText}</div>`;
+            const typingId = 'typing-' + Date.now();
+            chatBody.innerHTML += `<div id="${typingId}" class="chat-msg msg-ai italic text-zinc-500">Komutan düşünüyor...</div>`;
+            chatBody.scrollTop = chatBody.scrollHeight;
+            setTimeout(() => {
+                document.getElementById(typingId).remove();
+                chatBody.innerHTML += `<div class="chat-msg msg-ai">${aiText}</div>`;
+                chatBody.scrollTop = chatBody.scrollHeight;
+            }, 1000);
+        }
+
+        let c4TimerInterval; let correctWire; let c4TimeLeft = 45; let isC4Active = false;
+        function startC4Game() {
+            if(isC4Active) return;
+            isC4Active = true; c4TimeLeft = 45; correctWire = Math.floor(Math.random() * 4);
+            document.getElementById('c4-status').innerText = "BOMBA AKTİF - KABLOLARI KES!";
+            document.getElementById('c4-status').classList.add('text-red-500');
+            document.getElementById('wires-container').classList.remove('opacity-40', 'pointer-events-none');
+            document.getElementById('c4-start-btn').style.display = 'none';
+            document.querySelectorAll('.wire-btn').forEach(w => w.classList.remove('wire-cut'));
+            beepSound.currentTime = 0; beepSound.play();
+            c4TimerInterval = setInterval(() => {
+                c4TimeLeft--;
+                let sec = c4TimeLeft < 10 ? "0" + c4TimeLeft : c4TimeLeft;
+                document.getElementById('c4-timer').innerText = `${sec}:00`;
+                beepSound.currentTime = 0; beepSound.play();
+                if(c4TimeLeft <= 0) explodeC4();
+            }, 1000);
+        }
+
+        function cutWire(index, el) {
+            if(!isC4Active) return;
+            el.classList.add('wire-cut');
+            if(index === correctWire) {
+                clearInterval(c4TimerInterval); isC4Active = false;
+                document.getElementById('c4-status').innerText = "BOMBA İMHA EDİLDİ!";
+                document.getElementById('c4-status').className = "text-[10px] text-green-500 uppercase mt-2 tracking-widest";
+                document.getElementById('wires-container').classList.add('opacity-40', 'pointer-events-none');
+                document.getElementById('c4-start-btn').style.display = 'block';
+                showTacticalAlert("TEBRİKLER!", "Bombayı başarıyla imha ettiniz!");
+            } else { explodeC4(); }
+        }
+
+        function explodeC4() {
+            clearInterval(c4TimerInterval); isC4Active = false;
+            document.getElementById('c4-status').innerText = "TERÖRİSTLER KAZANDI";
+            document.getElementById('c4-status').className = "text-[10px] text-red-600 font-bold uppercase mt-2 tracking-widest";
+            document.getElementById('wires-container').classList.add('opacity-40', 'pointer-events-none');
+            document.getElementById('c4-start-btn').style.display = 'block';
+            const flash = document.getElementById('flashLayer');
+            flash.style.opacity = "1"; flash.style.pointerEvents = "all";
+            setTimeout(() => {
+                flash.style.opacity = "0"; flash.style.pointerEvents = "none";
+                showTacticalAlert("BOMBA PATLADI!", "Sektör yok oldu.");
+            }, 1200);
+        }
+
+        window.onload = () => { if(document.getElementById('idCardCanvas')) generateCard(); };
     </script>
 </body>
 </html>
