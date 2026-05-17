@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dust-II Drop | Kasa Açma Merkezi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght=400;700;900&family=Inter:wght=300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --dust-orange: #f59e0b;
+            --dust-black: #0a0a0a;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--dust-black);
+            color: #e5e5e5;
+            -webkit-tap-highlight-color: transparent;
+        }
+        h1, h2, h3, h4 { font-family: 'Orbitron', sans-serif; }
+        
+        .roulette-container {
+            position: relative;
+            width: 100%;
+            max-width: 850px;
+            height: 140px;
+            background: #111;
+            border: 2px solid rgba(245, 158, 11, 0.4);
+            overflow: hidden;
+        }
+        @media (min-width: 768px) {
+            .roulette-container { height: 160px; }
+        }
+        .roulette-wrapper {
+            display: flex;
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            will-change: transform;
+        }
+        .skin-card {
+            width: 140px;
+            height: 100%;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-right: 1px solid #1f1f1f;
+            padding: 8px;
+            text-align: center;
+            background: linear-gradient(180deg, rgba(15, 15, 15, 0.3) 0%, rgba(5, 5, 5, 0.9) 100%);
+            position: relative;
+        }
+        .pointer-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            width: 4px;
+            height: 100%;
+            background: #ef4444;
+            box-shadow: 0 0 20px #ef4444;
+            z-index: 10;
+            transform: translateX(-50%);
+        }
+        .rarity-mil-spec { border-bottom: 4px solid #4b69ff; box-shadow: inset 0 -10px 20px rgba(75, 105, 255, 0.15); }
+        .rarity-restricted { border-bottom: 4px solid #8847ff; box-shadow: inset 0 -10px 20px rgba(136, 71, 255, 0.15); }
+        .rarity-classified { border-bottom: 4px solid #d32ce6; box-shadow: inset 0 -10px 20px rgba(211, 44, 230, 0.15); }
+        .rarity-covert { border-bottom: 4px solid #eb4b4b; box-shadow: inset 0 -10px 20px rgba(235, 75, 75, 0.15); }
+        .rarity-special { border-bottom: 4px solid #ca8a04; box-shadow: inset 0 -10px 20px rgba(202, 138, 4, 0.25); }
+
+        .case-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .case-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--dust-orange);
+            box-shadow: 0 10px 20px rgba(245, 158, 11, 0.1);
+        }
+        @media (min-width: 768px) {
+            .case-card:hover {
+                transform: translateY(-8px);
+                box-shadow: 0 10px 30px rgba(245, 158, 11, 0.15);
+            }
+        }
+
+        @keyframes specialGlow {
+            0% { box-shadow: 0 0 20px rgba(202, 138, 4, 0.2); border-color: rgba(202, 138, 4, 0.4); }
+            50% { box-shadow: 0 0 40px rgba(202, 138, 4, 0.8); border-color: rgba(202, 138, 4, 1); }
+            100% { box-shadow: 0 0 20px rgba(202, 138, 4, 0.2); border-color: rgba(202, 138, 4, 0.4); }
+        }
+        @keyframes covertGlow {
+            0% { box-shadow: 0 0 20px rgba(235, 75, 75, 0.2); border-color: rgba(235, 75, 75, 0.4); }
+            50% { box-shadow: 0 0 40px rgba(235, 75, 75, 0.8); border-color: rgba(235, 75, 75, 1); }
+            100% { box-shadow: 0 0 20px rgba(235, 75, 75, 0.2); border-color: rgba(235, 75, 75, 0.4); }
+        }
+        .epic-glow-special { animation: specialGlow 2s infinite; }
+        .epic-glow-covert { animation: covertGlow 2s infinite; }
+
+        .confetti {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background-color: #f59e0b;
+            animation: confettiFall 2.5s linear infinite;
+            top: -10px;
+            z-index: 40;
+            border-radius: 50%;
+        }
+        @media (min-width: 768px) {
+            .confetti { width: 8px; height: 8px; animation-name: confettiFall; animation-duration: 3s; }
+        }
+        @keyframes confettiFall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(400px) rotate(360deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between select-none">
+
+    <header class="bg-zinc-900/90 border-b border-white/5 p-3 md:p-4 sticky top-0 z-50 backdrop-blur-md">
+        <div class="container mx-auto flex flex-wrap justify-between items-center gap-2">
+            <div class="flex items-center gap-2 md:gap-3">
+                <span onclick="goBackToSelection()" class="text-orange-500 font-black tracking-widest text-sm sm:text-base md:text-xl font-mono cursor-pointer">DUST-II DROP</span>
+                <span class="hidden xs:inline bg-zinc-800 text-zinc-400 text-[8px] md:text-[9px] font-bold px-1.5 md:py-0.5 rounded border border-white/5">V5.0 MOBILE</span>
+            </div>
+            <div class="flex items-center gap-1.5 md:gap-3 ml-auto sm:ml-0">
+                <button onclick="toggleInventoryModal(true)" class="text-[9px] md:text-[10px] bg-zinc-800 border border-zinc-700 text-zinc-300 px-2 md:px-3 py-1.5 md:py-2 hover:bg-orange-500 hover:text-black transition uppercase font-bold rounded flex items-center gap-1">
+                    🎒 <span class="hidden xs:inline">Envanterim</span> (<span id="navInvCount">0</span>)
+                </button>
+                <div class="bg-zinc-950 px-2.5 md:px-4 py-1.5 md:py-2 border border-zinc-800 rounded flex items-center gap-1.5 md:gap-2">
+                    <span class="text-[8px] md:text-[10px] text-zinc-500 font-bold uppercase hidden xxs:inline">Bakiye:</span>
+                    <span id="balanceDisplay" class="text-xs md:text-sm font-black font-mono text-green-400">10.000,00 ₺</span>
+                </div>
+                <button onclick="addMockMoney()" class="text-[9px] md:text-[10px] bg-green-600/20 border border-green-500/30 text-green-400 px-2 md:px-3 py-1.5 md:py-2 hover:bg-green-600/40 transition uppercase font-bold rounded">
+                    + Para
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div id="inventoryModal" class="fixed inset-0 bg-black/85 z-50 backdrop-blur-sm hidden items-center justify-center p-2 sm:p-4 transition-all duration-300">
+        <div class="bg-zinc-900 border border-white/10 rounded-xl md:rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.7)]">
+            <div class="p-4 md:p-5 border-b border-white/5 flex flex-wrap justify-between items-center bg-zinc-950/50 gap-2">
+                <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4">
+                    <h3 class="text-sm md:text-lg font-black tracking-wider text-orange-500 uppercase">// SİLAH DEPOSU</h3>
+                    <div class="bg-zinc-900 px-2 py-0.5 rounded text-[10px] md:text-xs text-zinc-400 border border-white/5 w-fit">
+                        Toplam Değer: <span id="modalInvValue" class="text-green-400 font-mono font-bold">0,00 ₺</span>
+                    </div>
+                </div>
+                <button onclick="toggleInventoryModal(false)" class="text-zinc-500 hover:text-white transition text-[10px] md:text-sm font-black uppercase tracking-wider bg-zinc-900 px-2.5 py-1 rounded border border-white/5">
+                    KAPAT [X]
+                </button>
+            </div>
+            
+            <div id="modalInventoryGrid" class="p-3 md:p-6 overflow-y-auto grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-2 md:gap-4 flex-1 min-h-[250px] bg-zinc-900/60">
+            </div>
+
+            <div class="p-3 md:p-4 border-t border-white/5 bg-zinc-950/50 flex flex-col sm:flex-row justify-between items-center gap-3">
+                <p class="text-[8px] md:text-[10px] text-zinc-500 uppercase tracking-wider text-center sm:text-left">Skinlerinizi buradan kontrol edebilir veya nakit paraya dönüştürebilirsiniz.</p>
+                <button onclick="sellAllInventory()" class="w-full sm:w-auto bg-red-600/20 border border-red-500/40 text-red-400 hover:bg-red-600 hover:text-white text-[10px] md:text-xs font-bold py-2 px-4 md:px-6 rounded-lg md:rounded-xl transition uppercase tracking-wider text-center">
+                    Tüm Envanteri Toplu Sat
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <section id="caseSelectionView" class="container mx-auto px-3 md:px-4 py-6 md:py-12 flex-1 max-w-7xl">
+        <div class="text-center mb-6 md:mb-12">
+            <h1 class="text-2xl sm:text-4xl md:text-6xl font-black italic tracking-tight uppercase">KASA <span class="text-orange-500">MERKEZİ</span></h1>
+            <p class="text-[8px] md:text-xs text-zinc-500 mt-1.5 md:mt-3 uppercase tracking-[0.2em] md:tracking-[0.3em]">Kasanı Seç, Operasyona Katıl, Bedelini Öde Ve Kazan</p>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5 md:gap-4 mb-6 md:mb-12 bg-zinc-900/30 border border-white/5 p-3 md:p-6 rounded-xl md:rounded-2xl backdrop-blur-sm">
+            <div class="text-center md:text-left border-b md:border-b-0 md:border-r border-white/5 pb-2 md:pb-0 md:pr-4">
+                <h4 class="text-[8px] md:text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Açılan Kasa</h4>
+                <div id="statTotalCases" class="text-sm sm:text-xl md:text-2xl font-black font-mono text-white mt-0.5">0</div>
+            </div>
+            <div class="text-center md:text-left border-b md:border-b-0 md:border-r border-white/5 pb-2 md:pb-0 md:px-4">
+                <h4 class="text-[8px] md:text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Harcanan Miktar</h4>
+                <div id="statTotalSpent" class="text-sm sm:text-xl md:text-2xl font-black font-mono text-red-400 mt-0.5">0,00 ₺</div>
+            </div>
+            <div class="text-center md:text-left pt-1 md:pt-0 md:px-4">
+                <h4 class="text-[8px] md:text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Envanter Değeri</h4>
+                <div id="statInventoryValue" class="text-sm sm:text-xl md:text-2xl font-black font-mono text-green-400 mt-0.5">0,00 ₺</div>
+            </div>
+            <div class="text-center md:text-left pt-1 md:pt-0 md:pl-4 col-span-2 md:col-span-1">
+                <h4 class="text-[8px] md:text-[10px] text-zinc-500 font-bold uppercase tracking-widest mb-1">Başarımlar</h4>
+                <div id="achievementBadges" class="flex flex-wrap justify-center md:justify-start gap-1">
+                    <span class="text-[8px] text-zinc-600 bg-zinc-950 px-1.5 py-0.5 rounded border border-white/5">Henüz Yok</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-8 md:mb-14">
+            <div class="flex items-center gap-2 mb-4 md:mb-6 border-b border-white/5 pb-2">
+                <h2 class="text-sm md:text-xl font-black text-orange-500 uppercase tracking-wider">// OPERASYON KASALARI</h2>
+                <span class="text-[8px] md:text-[10px] bg-zinc-800 text-zinc-400 px-1.5 py-0.5 rounded font-mono">3 KASA</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:grid-6 md:gap-6">
+                <div onclick="selectCase('milspec_heavy')" class="case-card bg-zinc-900/40 border border-white/5 rounded-xl md:rounded-2xl p-4 md:p-5 text-center cursor-pointer flex flex-col justify-between">
+                    <div>
+                        <span class="bg-blue-500/10 text-blue-400 text-[8px] md:text-[9px] font-bold px-2 py-0.5 md:py-1 rounded uppercase tracking-wider">Ekonomik</span>
+                        <h3 class="text-sm md:text-base font-black uppercase mt-2 md:mt-3 truncate">Milispec Ağır Yük</h3>
+                        <p class="text-[9px] md:text-[10px] text-zinc-500 mt-0.5 uppercase">Mavi ve Mor ağırlıklı</p>
+                    </div>
+                    <div class="my-4 md:my-6 flex justify-center">
+                        <img src="img/cases/chroma_3_case.png" alt="Kasa" class="w-20 h-20 md:w-28 md:h-28 object-contain drop-shadow-[0_10px_10px_rgba(59,130,246,0.2)]">
+                    </div>
+                    <div>
+                        <div class="text-[10px] md:text-[11px] text-zinc-400 mb-1.5 md:mb-2">En Değerli: <span class="text-purple-400 font-bold">USP Cyrex</span></div>
+                        <div class="bg-zinc-950 border border-zinc-800 text-orange-500 font-mono font-black py-1.5 md:py-2 rounded-lg md:rounded-xl text-xs">50,00 ₺</div>
+                    </div>
+                </div>
+
+                <div onclick="selectCase('dust_elite')" class="case-card bg-zinc-900/40 border border-white/5 rounded-xl md:rounded-2xl p-4 md:p-5 text-center cursor-pointer flex flex-col justify-between">
+                    <div>
+                        <span class="bg-orange-500/10 text-orange-400 text-[8px] md:text-[9px] font-bold px-2 py-0.5 md:py-1 rounded uppercase tracking-wider">Popüler</span>
+                        <h3 class="text-sm md:text-base font-black uppercase mt-2 md:mt-3 truncate">Dust-II Seçkin</h3>
+                        <p class="text-[9px] md:text-[10px] text-zinc-500 mt-0.5 uppercase">Gizli ve Efsanevi tüfekler</p>
+                    </div>
+                    <div class="my-4 md:my-6 flex justify-center">
+                        <img src="img/cases/clutch_case.png" alt="Kasa" class="w-20 h-20 md:w-28 md:h-28 object-contain drop-shadow-[0_10px_10px_rgba(245,158,11,0.2)]">
+                    </div>
+                    <div>
+                        <div class="text-[10px] md:text-[11px] text-zinc-400 mb-1.5 md:mb-2">En Değerli: <span class="text-red-500 font-bold">AK-47 Vulcan</span></div>
+                        <div class="bg-zinc-950 border border-zinc-800 text-orange-500 font-mono font-black py-1.5 md:py-2 rounded-lg md:rounded-xl text-xs">250,00 ₺</div>
+                    </div>
+                </div>
+
+                <div onclick="selectCase('knife_only')" class="case-card bg-zinc-900/40 border border-white/5 rounded-xl md:rounded-2xl p-4 md:p-5 text-center cursor-pointer flex flex-col justify-between">
+                    <div>
+                        <span class="bg-red-500/10 text-red-500 text-[8px] md:text-[9px] font-bold px-2 py-0.5 md:py-1 rounded uppercase tracking-wider">Yüksek Risk</span>
+                        <h3 class="text-sm md:text-base font-black uppercase mt-2 md:mt-3 truncate">Sadece Bıçak</h3>
+                        <p class="text-[9px] md:text-[10px] text-zinc-500 mt-0.5 uppercase">Düşük ihtimal, dev ödül</p>
+                    </div>
+                    <div class="my-4 md:my-6 flex justify-center">
+                        <img src="img/cases/danger_zone_case.png" alt="Kasa" class="w-20 h-20 md:w-28 md:h-28 object-contain drop-shadow-[0_10px_10px_rgba(239,68,68,0.2)]">
+                    </div>
+                    <div>
+                        <div class="text-[10px] md:text-[11px] text-zinc-400 mb-1.5 md:mb-2">En Değerli: <span class="text-yellow-600 font-bold">Lore Karambit</span></div>
+                        <div class="bg-zinc-950 border border-zinc-800 text-orange-500 font-mono font-black py-1.5 md:py-2 rounded-lg md:rounded-xl text-xs">1.500,00 ₺</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div class="flex items-center gap-2 mb-4 md:mb-6 border-b border-white/5 pb-2">
+                <h2 class="text-sm md:text-xl font-black text-purple-400 uppercase tracking-wider">// KİŞİSEL ÖZEL SERİ</h2>
+                <span class="text-[8px] md:text-[10px] bg-purple-950/50 text-purple-400 border border-purple-500/20 px-2 py-0.5 rounded font-mono">3 KASA</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                <div onclick="selectCase('ali_case')" class="case-card bg-zinc-900/40 border border-purple-500/20 rounded-xl md:rounded-2xl p-4 md:p-5 text-center cursor-pointer flex flex-col justify-between shadow-[0_0_15px_rgba(168,85,247,0.05)]">
+                    <div>
+                        <span class="bg-purple-500/20 text-purple-400 text-[8px] md:text-[9px] font-bold px-2 py-0.5 md:py-1 rounded uppercase tracking-wider">Kişisel Özel Seri</span>
+                        <h3 class="text-sm md:text-base font-black text-purple-400 uppercase mt-2 md:mt-3 truncate">ALICASE</h3>
+                        <p class="text-[9px] md:text-[10px] text-zinc-500 mt-0.5 uppercase">Alican'ın Şans Seçimi</p>
+                    </div>
+                    <div class="my-4 md:my-6 flex justify-center">
+                        <img src="img/cases/alicanspecial.png" alt="ALICASE" class="w-20 h-20 md:w-28 md:h-28 object-contain drop-shadow-[0_10px_15px_rgba(168,85,247,0.3)]">
+                    </div>
+                    <div>
+                        <div class="text-[10px] md:text-[11px] text-zinc-400 mb-1.5 md:mb-2">En Değerli: <span class="text-red-500 font-bold">AK-47 Inheritance</span></div>
+                        <div class="bg-zinc-950 border border-zinc-800 text-purple-400 font-mono font-black py-1.5 md:py-2 rounded-lg md:rounded-xl text-xs">400,00 ₺</div>
+                    </div>
+                </div>
+
+                <div onclick="selectCase('emir_special')" class="case-card bg-zinc-900/40 border border-purple-500/20 rounded-xl md:rounded-2xl p-4 md:p-5 text-center cursor-pointer flex flex-col justify-between shadow-[0_0_15px_rgba(168,85,247,0.05)]">
+                    <div>
+                        <span class="bg-purple-500/20 text-purple-400 text-[8px] md:text-[9px] font-bold px-2 py-0.5 md:py-1 rounded uppercase tracking-wider">Kişisel Özel Seri</span>
+                        <h3 class="text-sm md:text-base font-black uppercase mt-2 md:mt-3 truncate text-purple-400">Emir Başkan Seçim</h3>
+                        <p class="text-[9px] md:text-[10px] text-zinc-500 mt-0.5 uppercase">Efsanevi Dragon Lore havuzu</p>
+                    </div>
+                    <div class="my-4 md:my-6 flex justify-center">
+                        <img src="img/cases/emirbaskan (1).png" alt="Kasa" class="w-20 h-20 md:w-28 md:h-28 object-contain drop-shadow-[0_10px_15px_rgba(168,85,247,0.3)]">
+                    </div>
+                    <div>
+                        <div class="text-[10px] md:text-[11px] text-zinc-400 mb-1.5 md:mb-2">En Değerli: <span class="text-yellow-500 font-bold">Dragon Lore</span></div>
+                        <div class="bg-zinc-950 border border-zinc-800 text-purple-400 font-mono font-black py-1.5 md:py-2 rounded-lg md:rounded-xl text-xs">700,00 ₺</div>
+                    </div>
+                </div>
+
+                <div onclick="selectCase('xelamony_knife')" class="case-card bg-zinc-900/40 border border-purple-500/20 rounded-xl md:rounded-2xl p-4 md:p-5 text-center cursor-pointer flex flex-col justify-between shadow-[0_0_15px_rgba(168,85,247,0.05)]">
+                    <div>
+                        <span class="bg-purple-500/20 text-purple-400 text-[8px] md:text-[9px] font-bold px-2 py-0.5 md:py-1 rounded uppercase tracking-wider">Kişisel Özel Seri</span>
+                        <h3 class="text-sm md:text-base font-black uppercase mt-2 md:mt-3 truncate text-purple-400">Xelamony Knife</h3>
+                        <p class="text-[9px] md:text-[10px] text-zinc-500 mt-0.5 uppercase">Batunun Seçimi</p>
+                    </div>
+                    <div class="my-4 md:my-6 flex justify-center">
+                        <img src="img/cases/batucase.png" alt="Xelamony" class="w-20 h-20 md:w-28 md:h-28 object-contain drop-shadow-[0_10px_15px_rgba(168,85,247,0.3)]">
+                    </div>
+                    <div>
+                        <div class="text-[10px] md:text-[11px] text-zinc-400 mb-1.5 md:mb-2">En Değerli: <span class="text-yellow-600 font-bold">Karambit Scorched</span></div>
+                        <div class="bg-zinc-950 border border-zinc-800 text-purple-400 font-mono font-black py-1.5 md:py-2 rounded-lg md:rounded-xl text-xs">400,00 ₺</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="caseOpenerView" class="container mx-auto px-3 md:px-4 py-6 md:py-12 flex-col items-center justify-center flex-1 hidden relative max-w-5xl">
+        <div id="confettiContainer" class="absolute inset-0 overflow-hidden pointer-events-none z-40"></div>
+
+        <div class="mb-4 md:mb-6">
+            <button onclick="goBackToSelection()" class="text-[10px] md:text-xs text-zinc-400 hover:text-orange-500 transition font-bold uppercase tracking-wider">
+                ← DİĞER KASALARA GÖZ AT
+            </button>
+        </div>
+
+        <div class="text-center mb-5 md:mb-8">
+            <h2 id="activeCaseTitle" class="text-xl sm:text-3xl md:text-5xl font-black italic text-white uppercase">KASA İSMİ</h2>
+            <p id="activeCasePriceLabel" class="text-xs md:text-sm font-mono text-orange-500 mt-1 md:mt-2 font-bold">FİYAT: 0,00 ₺</p>
+        </div>
+
+        <div class="roulette-container rounded-xl md:rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.8)] mb-6 md:mb-8">
+            <div class="pointer-line"></div>
+            <div id="rouletteStream" class="roulette-wrapper"></div>
+        </div>
+
+        <button id="openCaseBtn" onclick="spinCase()" class="w-full sm:w-auto bg-orange-500 text-black font-black font-mono tracking-widest text-sm md:text-base px-8 md:px-16 py-3.5 md:py-4 rounded-xl uppercase hover:bg-white transition duration-300 shadow-[0_0_30px_rgba(245,158,11,0.3)]">
+            KASAYI AÇ
+        </button>
+
+        <div id="rewardDisplay" class="mt-6 md:mt-8 text-center opacity-0 scale-90 transition-all duration-500 bg-zinc-900/80 border border-orange-500/30 p-4 md:p-6 rounded-xl max-w-md w-full hidden relative z-50">
+            <div class="text-[9px] md:text-[10px] text-zinc-500 uppercase tracking-widest mb-1.5">Tebrikler! Çıkarılan Eşya</div>
+            <div id="rewardGlowContainer" class="p-3 md:p-4 rounded-xl bg-black/40 mb-3 md:mb-4 transition-all duration-300">
+                <img id="rewardImg" src="" alt="Ödül" class="w-28 h-28 md:w-36 md:h-36 mx-auto object-contain my-2 md:my-3 drop-shadow-2xl">
+            </div>
+            <div id="rewardName" class="text-base md:text-xl font-black uppercase text-white truncate">SKIN ADI</div>
+            <div id="rewardPrice" class="text-green-400 font-mono font-black text-base md:text-lg mt-0.5">0,00 ₺</div>
+            
+            <button id="instantSellBtn" onclick="sellLatestReward()" class="mt-3.5 md:mt-4 w-full bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 rounded-lg tracking-wider text-[10px] md:text-xs transition uppercase font-mono">
+                EŞYAYI ANINDA SAT (+0 ₺)
+            </button>
+        </div>
+
+        <div class="w-full mt-8 md:mt-12 border-t border-white/5 pt-6 md:pt-8">
+            <h4 class="text-[9px] md:text-xs font-black tracking-widest text-zinc-500 uppercase mb-3 md:mb-4">// KASA İÇERİĞİ VE ŞANS HAVUZU</h4>
+            <div id="caseContentsGrid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2 md:gap-3"></div>
+        </div>
+
+        <div class="w-full mt-8 md:mt-12 border-t border-white/5 pt-6 md:pt-8">
+            <div class="flex justify-between items-center mb-3 md:mb-4">
+                <h3 class="text-[9px] md:text-xs font-black tracking-widest text-zinc-400 uppercase">// SON ÇIKARILAN TEÇHİZATLAR</h3>
+                <button onclick="toggleInventoryModal(true)" class="text-[9px] md:text-[10px] text-orange-500 hover:underline uppercase font-bold">Tümünü Yönet 🎒</button>
+            </div>
+            <div id="inventoryGrid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2 md:gap-3">
+                <div class="bg-zinc-900/10 border border-white/5 p-4 text-center text-zinc-600 text-xs italic rounded col-span-full">
+                    Envanteriniz henüz boş...
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="p-4 md:p-6 bg-black/80 text-center border-t border-white/5 text-[8px] md:text-[9px] text-zinc-600 uppercase tracking-widest leading-relaxed">
+        Dust-II İlçe Başkanlığı Altyapısı. Gerçekçi ağırlık algoritması aktiftir.
+    </footer>
+
+    <script>
+        let balance = 10000.00;
+        let latestDroppedSkin = null;
+        let latestDroppedId = null;
+        let inventory = [];
+        let currentCaseKey = "";
+        let isSpinning = false;
+        const cardWidth = 140;
+
+        let stats = {
+            totalCases: 0,
+            totalSpent: 0,
+            unlockedAchievements: []
+        };
+
+        const achievementsList = {
+            first_case: { title: "İlk Adım", desc: "İlk kasanı açtın!", color: "bg-blue-600 text-white" },
+            covert_drop: { title: "Gizli Ajan", desc: "Covert (Kırmızı) skin düşürdün!", color: "bg-red-600 text-white" },
+            lucky_knife: { title: "Talih Kuşu", desc: "Efsanevi bir bıçak çıkardın!", color: "bg-yellow-600 text-black font-bold animate-pulse" },
+            high_roller: { title: "Büyük Kumarbaz", desc: "Toplam 5.000 ₺ harcadın!", color: "bg-purple-600 text-white" }
+        };
+
+        const tickSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
+        const winSound = new Audio('https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3');
+        tickSound.volume = 0.1;
+        winSound.volume = 0.3;
+
+        const skinDatabase = {
+            sand_dune: { name: "Glock-18 | Sand Dune", rarity: "mil-spec", price: 1.50, color: "rarity-mil-spec", img: "img/skins/glock_sand_dune.png" },
+            safari_mesh: { name: "AK-47 | Safari Mesh", rarity: "mil-spec", price: 12.00, color: "rarity-mil-spec", img: "img/skins/ak47_safari.png" },
+            boreal_forest: { name: "M4A1-S | Boreal Forest", rarity: "mil-spec", price: 25.00, color: "rarity-mil-spec", img: "img/skins/m4a1_boreal.png" },
+            grim: { name: "P90 | Grim", rarity: "mil-spec", price: 45.00, color: "rarity-mil-spec", img: "img/skins/p90_grim.png" },
+            meteorite: { name: "Desert Eagle | Meteorite", rarity: "restricted", price: 280.00, color: "rarity-restricted", img: "img/skins/deagle_meteorite.png" },
+            evil_daimyo: { name: "M4A4 | Evil Daimyo", rarity: "restricted", price: 620.00, color: "rarity-restricted", img: "img/skins/m4a4_evil_daimyo.png" },
+            cyrex: { name: "USP-S | Cyrex", rarity: "classified", price: 1200.00, color: "rarity-classified", img: "img/skins/usp_cyrex.png" },
+            hyper_beast: { name: "AWP | Hyper Beast", rarity: "classified", price: 2900.00, color: "rarity-classified", img: "img/skins/awp_hyper_beast.png" },
+            asiimov: { name: "AWP | Asiimov", rarity: "covert", price: 4200.00, color: "rarity-covert", img: "img/skins/awp_asiimov.png" },
+            vulcan: { name: "AK-47 | Vulcan", rarity: "covert", price: 18500.00, color: "rarity-covert", img: "img/skins/ak47_vulcan.png" },
+            dlore: { name: "AWP | Dragon Lore", rarity: "special", price: 45000.00, color: "rarity-special", img: "img/skins/awp_dragon_lore.png" },
+            fade_karambit: { name: "Karambit | Fade", rarity: "special", price: 85000.00, color: "rarity-special", img: "img/skins/knife_karambit_fade.png" },
+            blue_gem: { name: "Karambit | Lore (Special)", rarity: "special", price: 150000.00, color: "rarity-special", img: "img/skins/knife_karambit_lore.png" },
+            sg_aloha: { name: "SG 553 | Aloha", rarity: "mil-spec", price: 8.50, color: "rarity-mil-spec", img: "img/skins/sg_aloha.png" },
+            pro_aug: { name: "AUG | Aristocrat", rarity: "restricted", price: 55.00, color: "rarity-restricted", img: "img/skins/aug_aristocrat.png" },
+            ak47_inheritance: { name: "AK-47 | Inheritance", rarity: "covert", price: 4800.00, color: "rarity-covert", img: "img/skins/ak47_inheritance.png" },
+            karambit_scorched: { name: "Karambit | Scorched", rarity: "special", price: 12500.00, color: "rarity-special", img: "img/skins/karambit_scorched.png" }
+        };
+
+        const casePools = {
+            milspec_heavy: {
+                title: "Milispec Ağır Yük Kasası", price: 50.00,
+                items: [
+                    { key: "sand_dune", weight: 65 }, { key: "safari_mesh", weight: 24 },
+                    { key: "boreal_forest", weight: 8 }, { key: "grim", weight: 2.7 },
+                    { key: "meteorite", weight: 0.25 }, { key: "cyrex", weight: 0.05 }
+                ]
+            },
+            dust_elite: {
+                title: "Dust-II Seçkin Operasyon", price: 250.00,
+                items: [
+                    { key: "safari_mesh", weight: 55 }, { key: "grim", weight: 30 },
+                    { key: "evil_daimyo", weight: 11 }, { key: "cyrex", weight: 3.2 },
+                    { key: "hyper_beast", weight: 0.7 }, { key: "vulcan", weight: 0.1 }
+                ]
+            },
+            ali_case: {
+                title: "ALICASE", price: 400.00,
+                items: [
+                    { key: "sand_dune", weight: 50 }, { key: "sg_aloha", weight: 35 },
+                    { key: "pro_aug", weight: 14 }, { key: "ak47_inheritance", weight: 1 }
+                ]
+            },
+            emir_special: {
+                title: "Emir Başkan Özel Seçimi", price: 700.00,
+                items: [
+                    { key: "boreal_forest", weight: 60 }, { key: "meteorite", weight: 28 },
+                    { key: "hyper_beast", weight: 10 }, { key: "asiimov", weight: 1.7 },
+                    { key: "dlore", weight: 0.3 }
+                ]
+            },
+            xelamony_knife: {
+                title: "Xelamony Knife", price: 400.00,
+                items: [
+                    { key: "safari_mesh", weight: 99.7 }, { key: "karambit_scorched", weight: 0.3 }
+                ]
+            },
+            knife_only: {
+                title: "Sadece Bıçak Kasası", price: 1500.00,
+                items: [
+                    { key: "sand_dune", weight: 80 }, { key: "meteorite", weight: 18 },
+                    { key: "fade_karambit", weight: 1.6 }, { key: "blue_gem", weight: 0.4 }
+                ]
+            }
+        };
+
+        function loadStatsAndInventory() {
+            const savedStats = localStorage.getItem('dust2_drop_stats');
+            if (savedStats) stats = JSON.parse(savedStats);
+
+            const savedInventory = localStorage.getItem('dust2_drop_inventory');
+            if (savedInventory) {
+                inventory = JSON.parse(savedInventory);
+                rebuildInventoryUIs();
+            }
+            updateStatsUI();
+        }
+
+        function saveDataToStorage() {
+            localStorage.setItem('dust2_drop_stats', JSON.stringify(stats));
+            localStorage.setItem('dust2_drop_inventory', JSON.stringify(inventory));
+        }
+
+        function calculateInventoryValue() {
+            return inventory.reduce((total, item) => total + item.skin.price, 0);
+        }
+
+        function triggerAchievement(key) {
+            if (!stats.unlockedAchievements.includes(key)) {
+                stats.unlockedAchievements.push(key);
+                saveDataToStorage();
+                updateStatsUI();
+            }
+        }
+
+        function updateStatsUI() {
+            const invVal = calculateInventoryValue();
+            document.getElementById('statTotalCases').innerText = stats.totalCases;
+            document.getElementById('statTotalSpent').innerText = stats.totalSpent.toLocaleString('tr-TR', { minimumFractionDigits: 2 }) + " ₺";
+            document.getElementById('statInventoryValue').innerText = invVal.toLocaleString('tr-TR', { minimumFractionDigits: 2 }) + " ₺";
+            document.getElementById('modalInvValue').innerText = invVal.toLocaleString('tr-TR', { minimumFractionDigits: 2 }) + " ₺";
+            document.getElementById('navInvCount').innerText = inventory.length;
+
+            const badgesContainer = document.getElementById('achievementBadges');
+            if (stats.unlockedAchievements.length === 0) {
+                badgesContainer.innerHTML = '<span class="text-[8px] text-zinc-600 bg-zinc-950 px-1.5 py-0.5 rounded border border-white/5">Henüz Yok</span>';
+            } else {
+                badgesContainer.innerHTML = '';
+                stats.unlockedAchievements.forEach(key => {
+                    const ach = achievementsList[key];
+                    const span = document.createElement('span');
+                    span.className = `text-[8px] px-1.5 py-0.5 rounded border border-white/10 cursor-help ${ach.color}`;
+                    span.title = ach.desc;
+                    span.innerText = `🏆 ${ach.title}`;
+                    badgesContainer.appendChild(span);
+                });
+            }
+        }
+
+        function updateBalanceUI() {
+            document.getElementById('balanceDisplay').innerText = balance.toLocaleString('tr-TR', { minimumFractionDigits: 2 }) + " ₺";
+            updateStatsUI();
+        }
+
+        function addMockMoney() {
+            balance += 5000;
+            updateBalanceUI();
+        }
+
+        function toggleInventoryModal(open) {
+            const modal = document.getElementById('inventoryModal');
+            if (open) {
+                buildModalInventoryGrid();
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            } else {
+                modal.classList.remove('flex');
+                modal.classList.add('hidden');
+            }
+        }
+
+        function buildModalInventoryGrid() {
+            const grid = document.getElementById('modalInventoryGrid');
+            grid.innerHTML = '';
+
+            if (inventory.length === 0) {
+                grid.innerHTML = `
+                    <div class="bg-zinc-950/40 border border-dashed border-zinc-800 p-6 text-center text-zinc-500 text-xs italic rounded-xl col-span-full flex flex-col justify-center items-center gap-1.5">
+                        <span>🎒 Silah deponuz şu anda tamamen boş.</span>
+                        <span class="text-[10px] text-zinc-600 uppercase tracking-wider">Kasa açarak teçhizat biriktirebilirsiniz.</span>
+                    </div>
+                `;
+                return;
+            }
+
+            inventory.forEach(item => {
+                const div = document.createElement('div');
+                div.className = `bg-zinc-950/80 border border-white/5 p-2.5 text-center rounded-xl relative overflow-hidden group flex flex-col justify-between h-[160px] md:h-[180px] ${item.skin.color}`;
+                div.innerHTML = `
+                    <div>
+                        <div class="text-[8px] font-bold text-zinc-500 uppercase tracking-wider truncate">${item.skin.rarity}</div>
+                        <img src="${item.skin.img}" alt="inv" class="w-10 h-10 md:w-12 md:h-12 mx-auto object-contain my-1.5 transform group-hover:scale-110 transition duration-300">
+                        <div class="text-[9px] font-black text-white uppercase truncate">${item.skin.name}</div>
+                    </div>
+                    <div>
+                        <div class="text-[9px] md:text-[10px] text-green-400 font-mono font-bold mb-1.5">${item.skin.price.toFixed(2)} ₺</div>
+                        <button onclick="sellItemFromInventory('${item.id}')" class="w-full bg-red-600/20 border border-red-500/30 hover:bg-red-600 text-red-400 hover:text-white font-mono text-[9px] font-bold py-1 px-2 rounded-md transition uppercase">
+                            Sat $
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(div);
+            });
+        }
+
+        function rebuildInventoryUIs() {
+            const quickGrid = document.getElementById('inventoryGrid');
+            quickGrid.innerHTML = '';
+
+            if (inventory.length === 0) {
+                quickGrid.innerHTML = `
+                    <div class="bg-zinc-900/10 border border-white/5 p-4 text-center text-zinc-600 text-xs italic rounded col-span-full">
+                        Envanteriniz henüz boş...
+                    </div>
+                `;
+            } else {
+                [...inventory].reverse().forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = `bg-zinc-900/70 border border-white/10 p-2.5 text-center rounded-xl relative overflow-hidden group ${item.skin.color}`;
+                    div.innerHTML = `
+                        <div class="text-[8px] font-bold text-zinc-500 uppercase truncate">${item.skin.rarity}</div>
+                        <img src="${item.skin.img}" alt="inv" class="w-10 h-10 md:w-12 md:h-12 mx-auto object-contain my-1">
+                        <div class="text-[9px] font-black text-white uppercase truncate">${item.skin.name}</div>
+                        <div class="text-[9px] text-green-400 font-mono mt-0.5">${item.skin.price.toFixed(2)} ₺</div>
+                    `;
+                    quickGrid.appendChild(div);
+                });
+            }
+            buildModalInventoryGrid();
+            updateStatsUI();
+        }
+
+        function sellItemFromInventory(uniqueId) {
+            const itemToSell = inventory.find(item => item.id === uniqueId);
+            if (!itemToSell) return;
+
+            balance += itemToSell.skin.price;
+            inventory = inventory.filter(item => item.id !== uniqueId);
+            
+            saveDataToStorage();
+            updateBalanceUI();
+            rebuildInventoryUIs();
+        }
+
+        function sellAllInventory() {
+            if (inventory.length === 0) {
+                alert("Satılacak herhangi bir eşyanız bulunmuyor.");
+                return;
+            }
+
+            let totalPayout = inventory.reduce((total, item) => total + item.skin.price, 0);
+            balance += totalPayout;
+            inventory = [];
+            
+            saveDataToStorage();
+            updateBalanceUI();
+            rebuildInventoryUIs();
+            
+            alert(`Tüm envanter başarıyla satıldı! Hesap bakiyenize +${totalPayout.toFixed(2)} ₺ eklendi.`);
+        }
+
+        function selectCase(caseKey) {
+            if(isSpinning) return;
+            currentCaseKey = caseKey;
+            const targetCase = casePools[caseKey];
+
+            document.getElementById('caseSelectionView').classList.add('hidden');
+            document.getElementById('caseOpenerView').classList.remove('hidden');
+            document.getElementById('caseOpenerView').classList.add('flex');
+
+            document.getElementById('activeCaseTitle').innerText = targetCase.title;
+            document.getElementById('activeCasePriceLabel').innerText = `KASA FİYATI: ${targetCase.price.toFixed(2)} ₺`;
+            
+            const rewardPanel = document.getElementById('rewardDisplay');
+            rewardPanel.classList.add('hidden');
+            rewardPanel.classList.add('opacity-0');
+            latestDroppedSkin = null;
+            latestDroppedId = null;
+
+            document.getElementById('confettiContainer').innerHTML = '';
+            document.getElementById('rewardGlowContainer').classList.remove('epic-glow-special', 'epic-glow-covert');
+
+            buildCaseContentsGrid(targetCase.items);
+            setupRoulette(targetCase.items);
+        }
+
+        function goBackToSelection() {
+            if(isSpinning) return;
+            document.getElementById('caseOpenerView').classList.remove('flex');
+            document.getElementById('caseOpenerView').classList.add('hidden');
+            document.getElementById('caseSelectionView').classList.remove('hidden');
+            updateStatsUI();
+        }
+
+        function buildCaseContentsGrid(poolItems) {
+            const grid = document.getElementById('caseContentsGrid');
+            grid.innerHTML = '';
+            poolItems.forEach(itemConfig => {
+                const skin = skinDatabase[itemConfig.key];
+                const div = document.createElement('div');
+                div.className = `bg-zinc-900/40 border border-white/5 p-2.5 text-center rounded-xl relative overflow-hidden group ${skin.color}`;
+                div.innerHTML = `
+                    <img src="${skin.img}" alt="skin" class="w-12 h-12 md:w-16 md:h-16 mx-auto object-contain mb-1.5 transform group-hover:scale-110 transition duration-300">
+                    <div class="text-[9px] md:text-[10px] font-black text-white uppercase truncate">${skin.name}</div>
+                    <div class="text-[9px] text-orange-500 font-mono mt-0.5">${skin.price.toFixed(2)} ₺</div>
+                `;
+                grid.appendChild(div);
+            });
+        }
+
+        function setupRoulette(poolItems) {
+            const stream = document.getElementById('rouletteStream');
+            stream.style.transition = 'none';
+            stream.style.transform = 'translateX(0px)';
+            stream.offsetWidth; 
+
+            stream.innerHTML = '';
+            for (let i = 0; i < 65; i++) {
+                let randomConfig = poolItems[Math.floor(Math.random() * poolItems.length)];
+                let skin = skinDatabase[randomConfig.key];
+                
+                let card = document.createElement('div');
+                card.className = `skin-card ${skin.color}`;
+                card.innerHTML = `
+                    <img src="${skin.img}" alt="skin" class="w-12 h-12 md:w-16 md:h-16 object-contain">
+                    <div class="text-[9px] md:text-[10px] font-black text-white uppercase truncate mt-1.5 w-full">${skin.name}</div>
+                `;
+                stream.appendChild(card);
+            }
+        }
+
+        function pickWinningSkin(poolItems) {
+            let totalWeight = 0;
+            poolItems.forEach(item => totalWeight += item.weight);
+
+            let randomRoll = Math.random() * totalWeight;
+            let cumulativeWeight = 0;
+
+            for (let i = 0; i < poolItems.length; i++) {
+                cumulativeWeight += poolItems[i].weight;
+                if (randomRoll <= cumulativeWeight) {
+                    return skinDatabase[poolItems[i].key];
+                }
+            }
+            return skinDatabase[poolItems[0].key];
+        }
+
+        function launchConfetti() {
+            const container = document.getElementById('confettiContainer');
+            container.innerHTML = '';
+            const colors = ['#f59e0b', '#eb4b4b', '#ca8a04', '#ffffff', '#d32ce6'];
+            
+            for(let i=0; i<60; i++) {
+                const el = document.createElement('div');
+                el.className = 'confetti';
+                el.style.left = Math.random() * 100 + '%';
+                el.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                el.style.animationDelay = Math.random() * 2 + 's';
+                el.style.animationDuration = (Math.random() * 1.5 + 1) + 's';
+                container.appendChild(el);
+            }
+        }
+
+        function spinCase() {
+            if (isSpinning) return;
+
+            const targetCase = casePools[currentCaseKey];
+
+            if (balance < targetCase.price) {
+                alert("Yetersiz Bakiye! Lütfen sağ üstten para ekleyin.");
+                return;
+            }
+
+            balance -= targetCase.price;
+            stats.totalCases += 1;
+            stats.totalSpent += targetCase.price;
+
+            triggerAchievement('first_case');
+            if (stats.totalSpent >= 5000) triggerAchievement('high_roller');
+
+            updateBalanceUI();
+            saveDataToStorage();
+
+            isSpinning = true;
+            const stream = document.getElementById('rouletteStream');
+            
+            document.getElementById('openCaseBtn').disabled = true;
+            document.getElementById('openCaseBtn').innerText = "ÇARK DÖNÜYOR...";
+            
+            const rewardPanel = document.getElementById('rewardDisplay');
+            rewardPanel.classList.add('hidden');
+            rewardPanel.classList.add('opacity-0', 'scale-90');
+            
+            document.getElementById('rewardGlowContainer').classList.remove('epic-glow-special', 'epic-glow-covert');
+            document.getElementById('confettiContainer').innerHTML = '';
+
+            setupRoulette(targetCase.items);
+
+            const winningSkin = pickWinningSkin(targetCase.items);
+            const winningIndex = 48; 
+            const cards = stream.children;
+
+            cards[winningIndex].className = `skin-card ${winningSkin.color}`;
+            cards[winningIndex].innerHTML = `
+                <img src="${winningSkin.img}" alt="winner" class="w-12 h-12 md:w-16 md:h-16 object-contain">
+                <div class="text-[9px] md:text-[10px] font-black text-white uppercase truncate mt-1.5 w-full">${winningSkin.name}</div>
+            `;
+
+            const containerWidth = document.querySelector('.roulette-container').offsetWidth;
+            const centerOffset = containerWidth / 2;
+            let finalLandingX = (winningIndex * cardWidth) + (cardWidth / 2) - centerOffset;
+            finalLandingX += Math.floor(Math.random() * 60) - 30; 
+
+            setTimeout(() => {
+                stream.style.transition = 'transform 4.5s cubic-bezier(0.1, 0.85, 0.1, 1)';
+                stream.style.transform = `translateX(-${finalLandingX}px)`;
+                
+                let tickCounter = 0;
+                let tickInterval = setInterval(() => {
+                    if (tickCounter < 28) {
+                        try {
+                            tickSound.currentTime = 0;
+                            tickSound.play();
+                        } catch(e) {}
+                    }
+                    tickCounter++;
+                    if (tickCounter >= 32) clearInterval(tickInterval);
+                }, 130);
+            }, 50);
+
+            setTimeout(() => {
+                try { winSound.play(); } catch(e) {}
+
+                latestDroppedSkin = winningSkin;
+                latestDroppedId = "skin_" + Date.now();
+
+                document.getElementById('rewardImg').src = winningSkin.img;
+                document.getElementById('rewardName').innerText = winningSkin.name;
+                document.getElementById('rewardPrice').innerText = winningSkin.price.toFixed(2) + " ₺";
+                document.getElementById('instantSellBtn').innerText = `EŞYAYI ANINDA SAT (+${winningSkin.price.toFixed(2)} ₺)`;
+                
+                const glowContainer = document.getElementById('rewardGlowContainer');
+                glowContainer.className = `p-3 md:p-4 rounded-xl bg-black/40 mb-3 md:mb-4 border-b-4 ${winningSkin.color}`;
+
+                if (winningSkin.rarity === 'special') {
+                    glowContainer.classList.add('epic-glow-special');
+                    launchConfetti();
+                    triggerAchievement('lucky_knife');
+                } else if (winningSkin.rarity === 'covert') {
+                    glowContainer.classList.add('epic-glow-covert');
+                    launchConfetti();
+                    triggerAchievement('covert_drop');
+                }
+
+                rewardPanel.classList.remove('hidden');
+                setTimeout(() => {
+                    rewardPanel.classList.remove('opacity-0', 'scale-90');
+                    rewardPanel.classList.add('scale-100');
+                }, 50);
+
+                pushSkinToInventoryData(winningSkin, latestDroppedId);
+
+                document.getElementById('openCaseBtn').disabled = false;
+                document.getElementById('openCaseBtn').innerText = "KASAYI AÇ";
+                isSpinning = false;
+                updateStatsUI();
+            }, 4600); 
+        }
+
+        function pushSkinToInventoryData(skin, uniqueId) {
+            inventory.push({ id: uniqueId, skin: skin });
+            saveDataToStorage();
+            rebuildInventoryUIs();
+        }
+
+        function sellLatestReward() {
+            if (!latestDroppedSkin || !latestDroppedId) return;
+            sellItemFromInventory(latestDroppedId);
+
+            const rewardPanel = document.getElementById('rewardDisplay');
+            rewardPanel.classList.add('opacity-0', 'scale-90');
+            setTimeout(() => { rewardPanel.classList.add('hidden'); }, 300);
+
+            latestDroppedSkin = null;
+            latestDroppedId = null;
+        }
+
+        window.onload = function() {
+            loadStatsAndInventory();
+        };
+    </script>
+</body>
+</html>
